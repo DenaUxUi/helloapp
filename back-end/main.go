@@ -1,19 +1,23 @@
 package main
 
 import (
-    "database/sql"
-    "encoding/json"
-    "net/http"
-    "fmt"
-    "math/rand"
-    "log"
-    "os"
-    "time"
-    "strconv"
+	"database/sql"
+	"encoding/json"
+	"fmt"
+	"log"
+	// "math/rand"
+	"net/http"
+	"os"
+	"strconv"
+	// "time"
+    "context"
 
-    "github.com/gorilla/mux"
-    _ "github.com/lib/pq"
-    // "github.com/joho/godotenv"
+    ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/gorilla/mux"
+	_ "github.com/lib/pq"
+	// "golang.org/x/tools/go/cfg"
 )
 
 var db *sql.DB
@@ -25,8 +29,16 @@ var (
     user     string
     password string
     dbname   string
+    access   string
+    secret_access string
 )
-
+//  Определение переменных AWS
+func awsString(v string) *string {
+    return &v
+}
+func awsInt32(v int32) *int32 {
+    return &v
+}
 
 
 func init() {
@@ -35,6 +47,9 @@ func init() {
     user = os.Getenv("POSTGRES_USER")
     password = os.Getenv("POSTGRES_PASSWORD")
     dbname = os.Getenv("POSTGRES_DB")
+
+    access = os.Getenv("AWS_ACCESS_KEY_ID")
+    secret_access = os.Getenv("AWS_SECRET_ACCESS_KEY")
 }
 
 // структура для входящего запроса
@@ -74,15 +89,40 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 }
 func createInstance(w http.ResponseWriter, r *http.Request) {
     if r.Method != http.MethodGet {
-        http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
+        http.Error(w, "Only GET method is allowed", http.StatusMethodNotAllowed)
         return
     }
 
-    rand.Seed(time.Now().UnixNano()) // инициализация генератора случайных чисел
-    instanceId := rand.Intn(900000) + 100000 // 6-значный ID
+    ctx := context.TODO()
 
-    // Вставка в БД с плейсхолдером
-    _, err := db.Exec("INSERT INTO instances (instance) VALUES ($1)", instanceId)
+    cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion("eu-central-1"))
+
+    if err != nil {
+        http.Error(w, "Failed to load AWS config: "+err.Error(), http.StatusInternalServerError)
+        return
+    }
+    
+    ec2Client := ec2.NewFromConfig(cfg)
+
+    runResult, err := ec2Client.RunInstances(ctx, &ec2.RunInstancesInput{
+        ImageId:      awsString("ami-0a116fa7c861dd5f9"), // пример AMI Amazon Linux 2
+        InstanceType: ec2types.InstanceTypeT3Micro,
+        MinCount:     awsInt32(1),
+        MaxCount:     awsInt32(1),
+        KeyName:      awsString("ssh_key"), // ключ для SSH
+        SecurityGroupIds: []string{
+            "sg-0437fd19e52c2c2ed", // твой security group
+        },
+        SubnetId: awsString("subnet-0af6b202fe3479aaa"), // твой subnet
+    })
+
+    if err != nil {
+        log.Fatalf("Failed to create instance: %v", err)
+    }
+    instanceId :=*runResult.Instances[0].InstanceId
+    fmt.Printf("Created instance with ID %s\n", instanceId)
+
+    _, err = db.Exec("INSERT INTO instances (instance) VALUES ($1)", instanceId)
     if err != nil {
         http.Error(w, "Failed to insert into DB: "+err.Error(), http.StatusInternalServerError)
         log.Printf("Created instance with ID %d\n", instanceId)
@@ -142,9 +182,9 @@ func listInstance(w http.ResponseWriter, r *http.Request) {
     }
     defer rows.Close()
 
-    var instances []int
+    var instances []string
     for rows.Next() {
-        var instanceId int
+        var instanceId string
         if err := rows.Scan(&instanceId); err != nil {
             http.Error(w, "Failed to scan row: "+err.Error(), http.StatusInternalServerError)
             return
@@ -206,7 +246,7 @@ func main() {
     r.HandleFunc("/api/hello", formHandler).Methods("POST")
     r.HandleFunc("/api/ec2/create", createInstance).Methods("GET")
     r.HandleFunc("/api/ec2/list", listInstance).Methods("GET")
-    r.HandleFunc("/api/ec/terminate/{id}", terminateInstance).Methods("POST")
+    r.HandleFunc("/api/ec/terminate/{id}", terminateInstance).Methods("GET")
     
     // CORS
     handler := corsMiddleware(r)

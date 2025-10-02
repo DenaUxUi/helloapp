@@ -10,6 +10,10 @@ services:
     networks:
       - nginx_network
       - main_network
+    env_file:
+      - ../../.env
+    depends_on:
+      - main_database
 
 
   helloapp_nginx:
@@ -25,11 +29,12 @@ services:
     depends_on:
       - helloapp_backend
 
-  helloapp_db:
+  main_database:
     image: postgres:15-alpine
-    container_name: helloapp_db
+    container_name: main_database
     restart: unless-stopped
     volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - ../../storage:/var/lib/postgresql/data
     ports:
       - "5432:5432"
@@ -37,7 +42,6 @@ services:
       - main_network
     env_file:
       - ../../.env
-
 networks:
   main_network:
     driver: bridge

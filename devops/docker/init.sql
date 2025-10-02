@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS instances (
+    id SERIAL PRIMARY KEY,
+    instance BIGINT NOT NULL
+);
