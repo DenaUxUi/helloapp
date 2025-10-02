@@ -1,0 +1,50 @@
+services:
+  helloapp_backend:
+    container_name: helloapp_backend
+    build:
+      context: ../../
+      dockerfile: devops/Dockerfile
+    image: mydockerhubuser/helloapp-backend:latest
+    restart: unless-stopped
+    ports: 
+      - 8000:8000
+    networks:
+      - nginx_network
+      - main_network
+    env_file:
+      - ../../.env
+    depends_on:
+      - main_database
+
+  helloapp_nginx:
+    container_name: helloapp_nginx
+    image: nginx:1.25.2-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ../../front-end:/opt/services/helloapp/helloapp_frontend/dist
+    networks:
+      - nginx_network
+    depends_on:
+      - helloapp_backend
+
+  main_database:
+    image: postgres:15-alpine
+    container_name: main_database
+    restart: unless-stopped
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ../../storage:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - main_network
+    env_file:
+      - ../../.env
+
+networks:
+  main_network:
+    driver: bridge
+  nginx_network:
+    driver: bridge

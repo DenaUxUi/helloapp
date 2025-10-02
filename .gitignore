@@ -1,8 +1,40 @@
+# Бинарные файлы
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Каталог с скомпилированными бинарями
+/bin/
+/build/
+/dist/
+
+# enviroment
+
 .env
 
+# IDE и редакторы
+.vscode/
+.idea/
+*.swp
+*.swo
 
-go.*
+# Логи
+*.log
 
-*/storage/*
+# Системные файлы
+.DS_Store
+Thumbs.db
 
-storage/
+# файлы БД
+
+/storage/
+storage/*
+
+# секреты
+
+dena.pem
+
