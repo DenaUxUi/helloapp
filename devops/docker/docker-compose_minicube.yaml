@@ -4,7 +4,7 @@ services:
     build:
       context: ../../
       dockerfile: devops/Dockerfile
-    image: mydockerhubuser/helloapp-backend:latest
+    image: yourdevopsdena/helloapp-backend:latest
     restart: unless-stopped
     ports: 
       - 8000:8000
