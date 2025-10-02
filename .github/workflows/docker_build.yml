@@ -18,7 +18,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build backend image
-        run: docker compose build helloapp_backend
+        run: docker compose -f ./devops/docker/docker-compose.yaml build helloapp_backend
 
       - name: Push backend image
-        run: docker compose push helloapp_backend
+        run: docker compose -f ./devops/docker/docker-compose.yaml push helloapp_backend
