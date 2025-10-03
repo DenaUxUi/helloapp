@@ -246,7 +246,7 @@ func main() {
     r.HandleFunc("/api/hello", formHandler).Methods("POST")
     r.HandleFunc("/api/ec2/create", createInstance).Methods("GET")
     r.HandleFunc("/api/ec2/list", listInstance).Methods("GET")
-    r.HandleFunc("/api/ec/terminate/{id}", terminateInstance).Methods("GET")
+    r.HandleFunc("/api/ec2/terminate/{id}", terminateInstance).Methods("GET")
     
     // CORS
     handler := corsMiddleware(r)

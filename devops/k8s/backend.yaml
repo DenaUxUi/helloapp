@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloapp-backend
+  namespace: helloapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: helloapp-backend
+  template:
+    metadata:
+      labels:
+        app: helloapp-backend
+    spec:
+      containers:
+      - name: backend
+        image: yourdevopsdena/helloapp-backend:latest
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - configMapRef:
+            name: helloapp-env
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: helloapp-backend
+  namespace: helloapp
+spec:
+  selector:
+    app: helloapp-backend
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+  type: ClusterIP
