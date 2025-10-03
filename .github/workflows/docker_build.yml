@@ -29,6 +29,12 @@ jobs:
           
       - name: Build backend image
         run: docker compose -f ./devops/docker/docker-compose_minicube.yaml build helloapp_backend
-
+      
       - name: Push backend image
         run: docker compose -f ./devops/docker/docker-compose_minicube.yaml push helloapp_backend
+
+      - name: Build nginx image
+        run: docker compose -f ./devops/docker/docker-compose_minicube.yaml build helloapp_nginx
+        
+      - name: Push nginx image
+        run: docker compose -f ./devops/docker/docker-compose_minicube.yaml push helloapp_nginx
