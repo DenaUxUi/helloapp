@@ -37,4 +37,4 @@ storage/*
 # секреты
 
 dena.pem
-
+secrets.yaml

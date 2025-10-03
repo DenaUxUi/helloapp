@@ -21,7 +21,7 @@ services:
       context: ../../
       dockerfile: devops/Dockerfile.frontend
     container_name: helloapp_nginx
-    image: yourdevopsdena/helloapp_nginx:latest
+    image: yourdevopsdena/helloapp-nginx:latest
     ports:
       - "80:80"
     networks:
