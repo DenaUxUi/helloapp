@@ -38,3 +38,4 @@ storage/*
 
 dena.pem
 secrets.yaml
+devops/k8s/secrets.yaml
