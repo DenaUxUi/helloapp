@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: main-database
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: main-database
+spec:
+  selector:
+    matchLabels:
+      app: main-database
+  template:
+    metadata:
+      labels:
+        app: main-database
+    spec:
+      containers:
+      - name: main-database
+        image: "{{ .Values.image.database.image }}:{{ .Values.image.database.tag }}"
+        ports:
+          - containerPort: {{ .Values.image.database.port }}
+        envFrom:
+          - configMapRef:
+              name: helloapp-env
+        volumeMounts:
+          - name: init-sql
+            mountPath: /docker-entrypoint-initdb.d
+          - name: postgres-data
+            mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: init-sql
+        configMap:
+          name: initsql
+      - name: postgres-data
+        persistentVolumeClaim:
+          claimName: postgres-pvc

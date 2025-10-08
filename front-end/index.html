@@ -81,11 +81,14 @@
       <input
         type="text"
         id="endpoint"
-        value="http://127.0.0.1:8000/api/hello"
+        value="http://127.0.0.1:8080/api/hello"
       /><br />
       <label>Your Name:</label>
       <input type="text" id="name" /><br />
       <button onclick="sendRequest()">Submit</button>
+      <button onclick="createInstance()">Create instance</button>
+      <button onclick="getList()">Get list</button>
+      <button onclick="deleteInstance()">Delete instance</button>
       <h3>Server response:</h3>
       <textarea id="response" cols="50" rows="5" readonly></textarea>
     </div>

@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloapp-backend
+  namespace: {{ .Release.NamespaceBackend }}
+spec:
+  selector:
+    matchLabels:
+      app: helloapp-backend
+  template:
+    metadata:
+      labels:
+        app: helloapp-backend
+    spec:
+      containers:
+      - name: backend
+        image: "{{ .Values.image.backend.image }}:{{ .Values.image.backend.tag }}"
+        imagePullPolicy: {{ .Values.image.backend.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.service.backend.port }}
+        envFrom:
+        - configMapRef:
+            name: {{ .Values.envConfigMap }}

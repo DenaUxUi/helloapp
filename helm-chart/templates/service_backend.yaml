@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: helloapp-backend
+  namespace: {{ .Release.Namespace }}
+spec:
+  type: {{ .Values.service.backend.type }}
+  selector:
+    app: helloapp-backend
+  ports:
+    - protocol: TCP
+      port: {{ .Values.service.backend.port }}
+      targetPort: {{ .Values.service.backend.port }}

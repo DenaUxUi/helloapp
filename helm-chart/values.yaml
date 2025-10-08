@@ -1,0 +1,35 @@
+replicaCount: 1
+
+
+image:
+  backend:
+    image: yourdevopsdena/helloapp-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  nginx: 
+    image: yourdevopsdena/helloapp-nginx
+    tag: latest
+    port: 80
+  database:
+    image: postgres
+    tag: 15-alpine
+    port: 5432
+
+
+
+service:
+  backend:
+    type: ClusterIP
+    port: 8000
+  nginx:
+    port: 80
+  database:
+    type: NodePort
+    port: 5432
+    nodeport: 30032
+
+pvc:
+  database:
+    storage: 1Gi
+
+envConfigMap: helloapp-env

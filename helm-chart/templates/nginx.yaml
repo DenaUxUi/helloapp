@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloapp-nginx
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: helloapp-nginx
+  template:
+    metadata:
+      labels:
+        app: helloapp-nginx
+    spec:
+      containers:
+      - name: nginx
+        image: "{{ .Values.image.nginx.image }}:{{ .Values.image.nginx.tag }}"   # твой собранный образ
+        ports:
+        - containerPort: {{ .Values.image.nginx.port}}
