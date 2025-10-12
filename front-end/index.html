@@ -126,6 +126,25 @@
           document.getElementById("response").value = err;
         }
       }
+      async function createRequest() {
+        const endpoint = document.getElementById("endpoint").value;
+        
+        try {
+          const response = await fetch(endpoint, {
+            method: "GET",
+          });
+
+          if (!response.ok)
+            throw new Error("Request failed: " + response.status);
+
+          const data = await response.json();
+          // смотрим на ключ, который реально возвращает Go
+          document.getElementById("response").value =
+            data.message || JSON.stringify(data);
+        } catch (err) {
+          document.getElementById("response").value = err;
+        }
+      }
     </script>
   </body>
 </html>
