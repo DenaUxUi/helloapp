@@ -1,150 +1,208 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>API Tester</title>
-  </head>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 500px;
-      margin: 50px auto;
-      max-height: 100vh;
-      height: 90vh;
 
-      display: flex;
-      align-items: center;
-      justify-content: center;
+<head>
+  <title>API Tester</title>
+</head>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 500px;
+    margin: 50px auto;
+    max-height: 100vh;
+    height: 90vh;
 
-      background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-      background-size: cover;
+    background-repeat: no-repeat;
 
-      background-image: url("./pic.jpg");
-    }
+    background-size: cover;
 
-    .box {
-      background-color: #ffffff20;
+    background-image: url("./pic.jpg");
+  }
 
-      width: 460px;
-      border-radius: 12px;
-      padding: 24px;
+  .box {
+    background-color: #ffffff20;
 
-      overflow: hidden;
+    width: 460px;
+    border-radius: 12px;
+    padding: 24px;
 
-      color: white;
-      border: 1.5px solid #ffffff25;
+    overflow: hidden;
 
-      box-shadow: 1px 2px 15px #00000035;
-    }
+    color: white;
+    border: 1.5px solid #ffffff25;
 
-    button {
-      max-width: 100%;
-      width: 100%;
-      margin: 10px 0;
-      padding: 8px;
-      font-size: 16px;
+    box-shadow: 1px 2px 15px #00000035;
+  }
 
-      border-radius: 12px;
-      border: 2px solid #ffffff;
-      background: #ffffff00;
-      color: white;
-      transition: 0.4s;
-    }
+  button {
+    max-width: 100%;
+    width: 100%;
+    margin: 10px 0;
+    padding: 8px;
+    font-size: 16px;
 
-    button:hover,
-    button:focus {
-      transform: scale(1.009);
-    }
+    border-radius: 12px;
+    border: 2px solid #ffffff;
+    background: #ffffff00;
+    color: white;
+    transition: 0.4s;
+  }
 
-    input,
-    textarea {
-      border-radius: 12px;
-      max-width: 100%;
-      width: 440px;
-      margin: 10px 0;
-      padding: 8px;
-      font-size: 16px;
+  button:hover,
+  button:focus {
+    transform: scale(1.009);
+  }
 
-      border: 0px;
-    }
+  input,
+  textarea {
+    border-radius: 12px;
+    max-width: 100%;
+    width: 440px;
+    margin: 10px 0;
+    padding: 8px;
+    font-size: 16px;
 
-    textarea {
-      height: 100px;
-      resize: none;
-    }
-  </style>
+    border: 0px;
+  }
 
-  <body>
-    <div class="box">
-      <h1>API Hello Tester</h1>
-      <label>API Endpoint:</label>
-      <input
-        type="text"
-        id="endpoint"
-        value="http://127.0.0.1:8080/api/hello"
-      /><br />
-      <label>Your Name:</label>
-      <input type="text" id="name" /><br />
-      <button onclick="sendRequest()">Submit</button>
-      <button onclick="createInstance()">Create instance</button>
-      <button onclick="getList()">Get list</button>
-      <button onclick="deleteInstance()">Delete instance</button>
-      <h3>Server response:</h3>
-      <textarea id="response" cols="50" rows="5" readonly></textarea>
-    </div>
+  textarea {
+    height: 100px;
+    resize: none;
+  }
+</style>
 
-    <script>
-      async function sendRequest() {
-        const endpoint = document.getElementById("endpoint").value;
-        const name = document.getElementById("name").value;
+<body>
+  <div class="box">
+    <h1>API Hello Tester</h1>
+    <label>API Endpoint:</label>
+    <input type="text" id="endpoint" value="http://127.0.0.1:8080" /><br />
 
-        if (!endpoint || !name) {
-          alert("Please provide both endpoint and name.");
-          return;
-        }
+    <label>Your Name:</label>
+    <input type="text" id="name" /><br />
 
-        const payload = { name }; // тело запроса в JSON
+    <button onclick="sendRequest()">Submit</button>
+    <button onclick="createInstance()">Create instance</button>
+    <button onclick="getList()">Get list</button>
+    <select id="instanceList"></select>
+    <button onclick="deleteInstance()">Delete instance</button>
 
-        try {
-          const response = await fetch(endpoint, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-            },
-            body: JSON.stringify(payload),
-          });
+    <h3>Server response:</h3>
+    <textarea id="response" cols="50" rows="5" readonly></textarea>
+  </div>
 
-          if (!response.ok)
-            throw new Error("Request failed: " + response.status);
+  <script>
+    async function sendRequest() {
+      const endpoint = document.getElementById("endpoint").value + "/api/hello";
+      const name = document.getElementById("name").value;
 
-          const data = await response.json();
-          // смотрим на ключ, который реально возвращает Go
-          document.getElementById("response").value =
-            data.message || JSON.stringify(data);
-        } catch (err) {
-          document.getElementById("response").value = err;
-        }
+      if (!endpoint || !name) {
+        alert("Please provide both endpoint and name.");
+        return;
       }
-      async function createRequest() {
-        const endpoint = document.getElementById("endpoint").value;
-        
-        try {
-          const response = await fetch(endpoint, {
-            method: "GET",
-          });
 
-          if (!response.ok)
-            throw new Error("Request failed: " + response.status);
+      const payload = { name };
 
-          const data = await response.json();
-          // смотрим на ключ, который реально возвращает Go
-          document.getElementById("response").value =
-            data.message || JSON.stringify(data);
-        } catch (err) {
-          document.getElementById("response").value = err;
-        }
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok)
+          throw new Error("Request failed: " + response.status);
+
+        const data = await response.json();
+        document.getElementById("response").value =
+          data.message || JSON.stringify(data);
+      } catch (err) {
+        document.getElementById("response").value = err;
       }
-    </script>
-  </body>
+    }
+
+    async function createInstance() {
+      const endpoint = document.getElementById("endpoint").value + "/api/ec2/create";
+
+      try {
+        const response = await fetch(endpoint, { method: "GET" });
+
+        if (!response.ok)
+          throw new Error("Request failed: " + response.status);
+
+        const data = await response.json();
+        document.getElementById("response").value =
+          data.message || JSON.stringify(data);
+      } catch (err) {
+        document.getElementById("response").value = err;
+      }
+    }
+
+    async function getList() {
+      const endpoint = document.getElementById("endpoint").value + "/api/ec2/list";
+
+      try {
+        const response = await fetch(endpoint, { method: "GET" });
+
+        if (!response.ok)
+          throw new Error("Request failed: " + response.status);
+
+        const data = await response.json();
+        const select = document.getElementById("instanceList");
+        select.innerHTML = "";
+
+        // Используем data.instances как массив строк
+        if (Array.isArray(data.instances)) {
+          data.instances.forEach((id) => {
+            const option = document.createElement("option");
+            option.value = id;
+            option.text = id;
+            select.appendChild(option);
+          });
+        } else {
+          throw new Error("Invalid response format: instances is not an array");
+        }
+
+        document.getElementById("response").value = JSON.stringify(data);
+      } catch (err) {
+        document.getElementById("response").value = err;
+      }
+    }
+
+
+    async function deleteInstance() {
+      const endpointBase = document.getElementById("endpoint").value;
+      const select = document.getElementById("instanceList");
+      const selectedIndex = select.selectedIndex;
+
+      if (selectedIndex === -1) {
+        alert("Please select an instance to delete.");
+        return;
+      }
+
+      const endpoint = `${endpointBase}/api/ec2/terminate/${selectedIndex}`;
+
+      try {
+        const response = await fetch(endpoint, { method: "GET" });
+
+        if (!response.ok)
+          throw new Error("Request failed: " + response.status);
+
+        const data = await response.json();
+        document.getElementById("response").value =
+          data.message || JSON.stringify(data);
+      } catch (err) {
+        document.getElementById("response").value = err;
+      }
+    }
+
+  </script>
+</body>
+
 </html>

@@ -20,7 +20,7 @@ services:
     container_name: helloapp_nginx
     image: nginx:1.25.2-alpine
     ports:
-      - "8001:80"
+      - "8080:8080"
     volumes:
       - ./nginx:/etc/nginx/conf.d
       - ../../front-end:/opt/services/helloapp/helloapp_frontend/dist
